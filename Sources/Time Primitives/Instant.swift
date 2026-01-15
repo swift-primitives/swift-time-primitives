@@ -21,8 +21,7 @@
 /// let instant = Instant(time)
 /// let backToTime = Time(instant)
 /// ```
-@available(macOS 13.0, iOS 16.0, tvOS 16.0, watchOS 9.0, *)
-public struct Instant: Sendable, Equatable, Hashable, Comparable, Codable {
+public struct Instant: Sendable, Equatable, Hashable, Comparable {
     /// Seconds since Unix epoch (Int64 for platform portability)
     public let secondsSinceUnixEpoch: Int64
 
@@ -46,7 +45,6 @@ public struct Instant: Sendable, Equatable, Hashable, Comparable, Codable {
 
 // MARK: - Error
 
-@available(macOS 13.0, iOS 16.0, tvOS 16.0, watchOS 9.0, *)
 extension Instant {
     /// Validation errors for instant values.
     public enum Error: Swift.Error, Sendable, Equatable {
@@ -57,7 +55,6 @@ extension Instant {
 
 // MARK: - Unchecked Initialization
 
-@available(macOS 13.0, iOS 16.0, tvOS 16.0, watchOS 9.0, *)
 extension Instant {
     /// Private initializer that bypasses validation
     public init(
@@ -72,7 +69,6 @@ extension Instant {
 
 // MARK: - Conversions
 
-@available(macOS 13.0, iOS 16.0, tvOS 16.0, watchOS 9.0, *)
 extension Instant {
 
     /// Creates instant from time.
@@ -86,7 +82,6 @@ extension Instant {
 
 // MARK: - Comparable
 
-@available(macOS 13.0, iOS 16.0, tvOS 16.0, watchOS 9.0, *)
 extension Instant {
     @inlinable
     public static func < (lhs: Instant, rhs: Instant) -> Bool {
@@ -105,7 +100,6 @@ extension Instant {
 
 // MARK: - Timeline Arithmetic
 
-@available(macOS 13.0, iOS 16.0, tvOS 16.0, watchOS 9.0, *)
 extension Instant {
     /// Adds a duration to an instant.
     ///
@@ -210,7 +204,6 @@ extension Instant {
 
 // MARK: - InstantProtocol Conformance
 
-@available(macOS 13.0, iOS 16.0, tvOS 16.0, watchOS 9.0, *)
 extension Instant: InstantProtocol {
     public typealias Duration = Swift.Duration
 
@@ -222,3 +215,9 @@ extension Instant: InstantProtocol {
         other - self
     }
 }
+
+// MARK: - Codable
+
+#if !hasFeature(Embedded)
+extension Instant: Codable {}
+#endif

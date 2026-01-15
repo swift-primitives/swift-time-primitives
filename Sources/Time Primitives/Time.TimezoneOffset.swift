@@ -17,7 +17,7 @@ extension Time {
     /// let ist = Time.TimezoneOffset(hours: 5, minutes: 30) // IST: +5:30
     /// print(ist.description) // "+05:30"
     /// ```
-    public struct TimezoneOffset: Sendable, Equatable, Hashable, Codable {
+    public struct TimezoneOffset: Sendable, Equatable, Hashable {
         /// Offset in seconds from UTC (positive = east, negative = west)
         public let seconds: Int
 
@@ -84,3 +84,9 @@ extension Time.TimezoneOffset: Comparable {
         lhs.seconds < rhs.seconds
     }
 }
+
+// MARK: - Codable
+
+#if !hasFeature(Embedded)
+extension Time.TimezoneOffset: Codable {}
+#endif
