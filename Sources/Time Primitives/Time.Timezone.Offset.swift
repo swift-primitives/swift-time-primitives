@@ -1,9 +1,9 @@
-// Time.TimezoneOffset.swift
+// Time.Timezone.Offset.swift
 // Time
 //
 // Type-safe timezone offset representation
 
-extension Time {
+extension Time.Timezone {
     /// Timezone offset from UTC in seconds.
     ///
     /// Positive values represent timezones east of UTC (ahead), negative values west (behind).
@@ -12,12 +12,12 @@ extension Time {
     /// ## Example
     ///
     /// ```swift
-    /// let utc = Time.TimezoneOffset.utc
-    /// let est = Time.TimezoneOffset(hours: -5) // EST: -5:00
-    /// let ist = Time.TimezoneOffset(hours: 5, minutes: 30) // IST: +5:30
+    /// let utc = Time.Timezone.Offset.utc
+    /// let est = Time.Timezone.Offset(hours: -5) // EST: -5:00
+    /// let ist = Time.Timezone.Offset(hours: 5, minutes: 30) // IST: +5:30
     /// print(ist.description) // "+05:30"
     /// ```
-    public struct TimezoneOffset: Sendable, Equatable, Hashable {
+    public struct Offset: Sendable, Equatable, Hashable {
         /// Offset in seconds from UTC (positive = east, negative = west)
         public let seconds: Int
 
@@ -37,7 +37,7 @@ extension Time {
         }
 
         /// UTC timezone offset (zero)
-        public static let utc = TimezoneOffset(seconds: 0)
+        public static let utc = Offset(seconds: 0)
 
         /// Hour component of the offset
         public var hours: Int {
@@ -59,7 +59,7 @@ extension Time {
 
 // MARK: - CustomStringConvertible
 
-extension Time.TimezoneOffset: CustomStringConvertible {
+extension Time.Timezone.Offset: CustomStringConvertible {
     /// Formats as +HH:MM or -HH:MM.
     public var description: String {
         if seconds == 0 {
@@ -79,8 +79,8 @@ extension Time.TimezoneOffset: CustomStringConvertible {
 
 // MARK: - Comparable
 
-extension Time.TimezoneOffset: Comparable {
-    public static func < (lhs: Time.TimezoneOffset, rhs: Time.TimezoneOffset) -> Bool {
+extension Time.Timezone.Offset: Comparable {
+    public static func < (lhs: Time.Timezone.Offset, rhs: Time.Timezone.Offset) -> Bool {
         lhs.seconds < rhs.seconds
     }
 }
@@ -88,5 +88,5 @@ extension Time.TimezoneOffset: Comparable {
 // MARK: - Codable
 
 #if !hasFeature(Embedded)
-extension Time.TimezoneOffset: Codable {}
+extension Time.Timezone.Offset: Codable {}
 #endif
