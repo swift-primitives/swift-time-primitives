@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "swift-time-primitives",
+    name: "swift-time-primitives-tests",
     platforms: [
         .macOS(.v26),
         .iOS(.v26),
@@ -11,23 +11,23 @@ let package = Package(
         .watchOS(.v26),
         .visionOS(.v26),
     ],
-    products: [
-        .library(
-            name: "Time Primitives",
-            targets: ["Time Primitives"]
-        ),
-    ],
     dependencies: [
-        .package(path: "../swift-standard-library-extensions"),
-        .package(path: "../swift-dimension-primitives"),
+        // Parent package
+        .package(path: "../"),
+        // Testing framework
+        .package(path: "../../../swift-foundations/swift-testing"),
+        // Test primitives (for test utilities)
+        .package(path: "../../swift-test-primitives"),
     ],
     targets: [
-        .target(
-            name: "Time Primitives",
+        .testTarget(
+            name: "Time Primitives Tests",
             dependencies: [
-                .product(name: "Standard Library Extensions", package: "swift-standard-library-extensions"),
-                .product(name: "Dimension Primitives", package: "swift-dimension-primitives"),
-            ]
+                .product(name: "Time Primitives", package: "swift-time-primitives"),
+                .product(name: "Testing", package: "swift-testing"),
+                .product(name: "Test Primitives", package: "swift-test-primitives"),
+            ],
+            path: "Sources/Time Primitives Tests"
         ),
     ],
     swiftLanguageModes: [.v6]
@@ -38,8 +38,6 @@ for target in package.targets where ![.system, .binary, .plugin, .macro].contain
         .enableUpcomingFeature("ExistentialAny"),
         .enableUpcomingFeature("InternalImportsByDefault"),
         .enableUpcomingFeature("MemberImportVisibility"),
-        .enableExperimentalFeature("Lifetimes"),
-        .strictMemorySafety(),
     ]
     target.swiftSettings = (target.swiftSettings ?? []) + settings
 }

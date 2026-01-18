@@ -274,14 +274,15 @@ extension Swift.Duration {
     /// ## Example
     ///
     /// ```swift
-    /// Duration.milliseconds(1500).formatted(.duration)    // "1.5 s"
-    /// Duration.microseconds(500).formatted(.microseconds) // "500 µs"
+    /// Duration.milliseconds(1500).formatted()             // "1.5 s"
+    /// Duration.microseconds(500).formatted()              // "500 µs"
+    /// Duration.milliseconds(1500).formatted(.milliseconds) // "1500 ms"
     /// ```
     ///
-    /// - Parameter format: Format style to apply.
+    /// - Parameter format: Format style to apply. Defaults to automatic unit selection.
     /// - Returns: Formatted string representation.
     @inlinable
-    public func formatted(_ format: Time.Format) -> String {
+    public func formatted(_ format: Time.Format = .duration) -> String {
         format.format(self)
     }
 }
