@@ -20,6 +20,7 @@ let package = Package(
     dependencies: [
         .package(path: "../swift-standard-library-extensions"),
         .package(path: "../swift-dimension-primitives"),
+        .package(path: "../swift-formatting-primitives"),
     ],
     targets: [
         .target(
@@ -27,6 +28,7 @@ let package = Package(
             dependencies: [
                 .product(name: "Standard Library Extensions", package: "swift-standard-library-extensions"),
                 .product(name: "Dimension Primitives", package: "swift-dimension-primitives"),
+                .product(name: "Formatting Primitives", package: "swift-formatting-primitives"),
             ]
         ),
     ],
