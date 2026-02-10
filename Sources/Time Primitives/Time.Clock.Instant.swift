@@ -34,7 +34,7 @@ extension Tagged: @retroactive InstantProtocol where RawValue == Int64 {
     @inlinable
     public func advanced(by duration: Duration) -> Self {
         (try? advancedThrowing(by: duration))
-            ?? (duration.components.seconds > 0 ? Self(Int64.max) : Self(Int64.min))
+            ?? (duration.components.seconds > 0 ? Self(__unchecked: (), Int64.max) : Self(__unchecked: (), Int64.min))
     }
 
     /// Returns a new instant advanced by the specified duration.
@@ -59,7 +59,7 @@ extension Tagged: @retroactive InstantProtocol where RawValue == Int64 {
         let (result, ov3) = self.rawValue.addingReportingOverflow(deltaNs)
         if ov3 { throw .overflow }
 
-        return Self(result)
+        return Self(__unchecked: (), result)
     }
 }
 
@@ -101,6 +101,6 @@ extension Tagged where RawValue == Int64 {
         let (total, ov2) = secToNs.addingReportingOverflow(subNs)
         if ov2 { throw .overflow }
 
-        self = .init(total)
+        self = .init(__unchecked: (), total)
     }
 }
