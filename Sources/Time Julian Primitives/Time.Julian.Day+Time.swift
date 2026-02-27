@@ -4,6 +4,7 @@
 // Conversions between Time and Julian Day
 
 public import Dimension_Primitives
+@_spi(Internal) internal import Time_Primitives_Core
 
 // MARK: - Time → Julian Day
 

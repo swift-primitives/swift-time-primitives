@@ -5,7 +5,8 @@
 
 import Testing
 
-@testable import Time_Primitives
+@testable import Time_Primitives_Core
+import Time_Primitives
 
 @Suite
 struct `Time Exhaustive Tests` {

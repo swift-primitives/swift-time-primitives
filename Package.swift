@@ -12,25 +12,54 @@ let package = Package(
         .visionOS(.v26),
     ],
     products: [
+        // MARK: - Core
+        .library(
+            name: "Time Primitives Core",
+            targets: ["Time Primitives Core"]
+        ),
+        // MARK: - Variants
+        .library(
+            name: "Time Julian Primitives",
+            targets: ["Time Julian Primitives"]
+        ),
+        // MARK: - Umbrella
         .library(
             name: "Time Primitives",
             targets: ["Time Primitives"]
         ),
     ],
     dependencies: [
-        .package(path: "../swift-standard-library-extensions"),
         .package(path: "../swift-dimension-primitives"),
         .package(path: "../swift-formatting-primitives"),
     ],
     targets: [
+        // MARK: - Core
         .target(
-            name: "Time Primitives",
+            name: "Time Primitives Core",
             dependencies: [
-                .product(name: "Standard Library Extensions", package: "swift-standard-library-extensions"),
-                .product(name: "Dimension Primitives", package: "swift-dimension-primitives"),
                 .product(name: "Formatting Primitives", package: "swift-formatting-primitives"),
             ]
         ),
+
+        // MARK: - Variants
+        .target(
+            name: "Time Julian Primitives",
+            dependencies: [
+                "Time Primitives Core",
+                .product(name: "Dimension Primitives", package: "swift-dimension-primitives"),
+            ]
+        ),
+
+        // MARK: - Umbrella
+        .target(
+            name: "Time Primitives",
+            dependencies: [
+                "Time Primitives Core",
+                "Time Julian Primitives",
+            ]
+        ),
+
+        // MARK: - Tests
         .testTarget(
             name: "Time Primitives Tests",
             dependencies: [

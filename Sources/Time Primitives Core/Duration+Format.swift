@@ -1,6 +1,8 @@
 // Duration+Format.swift
 // Duration formatting with auto-unit selection.
 
+public import Formatting_Primitives
+
 extension Time {
     /// Format style for converting Duration values to human-readable strings.
     ///
@@ -156,19 +158,27 @@ extension Time.Format {
     }
 }
 
-// MARK: - Format Method
+// MARK: - FormatStyle Conformance
 
-extension Time.Format {
+extension Time.Format: FormatStyle {
+    public typealias FormatInput = Swift.Duration
+    public typealias FormatOutput = String
+
     /// Formats a Duration to a human-readable string.
     ///
     /// - Parameter duration: The Duration to format.
     /// - Returns: A formatted string representation.
     public func format(_ duration: Swift.Duration) -> String {
         let (value, symbol) = selectUnit(for: duration)
-        let numericString = formatNumber(value)
+        let numericFormat = numericFormatStyle(for: value)
+        let numericString = numericFormat.format(value)
         return numericString + notation.separator + symbol
     }
+}
 
+// MARK: - Unit Selection
+
+extension Time.Format {
     /// Selects the appropriate unit and calculates the display value.
     @usableFromInline
     func selectUnit(for duration: Swift.Duration) -> (Double, String) {
@@ -195,74 +205,13 @@ extension Time.Format {
         }
     }
 
-    /// Formats the numeric value with appropriate precision.
+    /// Builds the appropriate `Format.FloatingPoint` for the given value.
     @usableFromInline
-    func formatNumber(_ value: Double) -> String {
-        if let precision = precisionDigits {
-            return formatWithPrecision(value, precision: precision)
+    func numericFormatStyle(for value: Double) -> Formatting_Primitives.Format.FloatingPoint {
+        if let digits = precisionDigits {
+            return .number.precision(digits)
         }
-
-        // Auto-precision: show decimals only when meaningful
-        if value == value.rounded() {
-            return "\(Int(value))"
-        }
-
-        // Default to 2 decimal places, strip trailing zeros
-        let formatted = formatWithPrecision(value, precision: 2)
-        return stripTrailingZeros(formatted)
-    }
-
-    /// Formats a value with specified decimal precision.
-    @usableFromInline
-    func formatWithPrecision(_ value: Double, precision: Int) -> String {
-        guard precision > 0 else {
-            return "\(Int(value.rounded()))"
-        }
-
-        var multiplier = 1.0
-        for _ in 0..<precision {
-            multiplier *= 10.0
-        }
-
-        let rounded = (value * multiplier).rounded() / multiplier
-
-        // Build the string representation
-        let intPart = Int(rounded)
-        let fracPart = rounded - Double(intPart)
-
-        if precision == 0 || fracPart == 0 {
-            // Pad with zeros if precision specified
-            if precision > 0 {
-                return "\(intPart)." + String(repeating: "0", count: precision)
-            }
-            return "\(intPart)"
-        }
-
-        // Calculate fractional digits
-        var fracValue = fracPart
-        var fracString = ""
-        for _ in 0..<precision {
-            fracValue *= 10
-            let digit = Int(fracValue) % 10
-            fracString += "\(digit)"
-        }
-
-        return "\(intPart).\(fracString)"
-    }
-
-    /// Removes trailing zeros after decimal point.
-    @usableFromInline
-    func stripTrailingZeros(_ string: String) -> String {
-        guard string.contains(".") else { return string }
-
-        var result = string
-        while result.hasSuffix("0") {
-            result.removeLast()
-        }
-        if result.hasSuffix(".") {
-            result.removeLast()
-        }
-        return result
+        return .number
     }
 }
 
