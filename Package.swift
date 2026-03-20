@@ -27,6 +27,10 @@ let package = Package(
             name: "Time Primitives",
             targets: ["Time Primitives"]
         ),
+        .library(
+            name: "Time Primitives Test Support",
+            targets: ["Time Primitives Test Support"]
+        ),
     ],
     dependencies: [
         .package(path: "../swift-dimension-primitives"),
@@ -65,6 +69,16 @@ let package = Package(
             dependencies: [
                 "Time Primitives",
             ]
+        ),
+
+        // MARK: - Test Support
+        .target(
+            name: "Time Primitives Test Support",
+            dependencies: [
+                "Time Primitives",
+                .product(name: "Dimension Primitives Test Support", package: "swift-dimension-primitives"),
+            ],
+            path: "Tests/Support"
         ),
     ],
     swiftLanguageModes: [.v6]

@@ -158,11 +158,11 @@ extension Time.Format {
     }
 }
 
-// MARK: - FormatStyle Conformance
+// MARK: - Format.Style Conformance
 
-extension Time.Format: FormatStyle {
-    public typealias FormatInput = Swift.Duration
-    public typealias FormatOutput = String
+extension Time.Format: Format.Style {
+    public typealias Input = Swift.Duration
+    public typealias Output = String
 
     /// Formats a Duration to a human-readable string.
     ///
@@ -205,9 +205,9 @@ extension Time.Format {
         }
     }
 
-    /// Builds the appropriate `Format.FloatingPoint` for the given value.
+    /// Builds the appropriate `Format.Decimal` for the given value.
     @usableFromInline
-    func numericFormatStyle(for value: Double) -> Formatting_Primitives.Format.FloatingPoint {
+    func numericFormatStyle(for value: Double) -> Formatting_Primitives.Format.Decimal {
         if let digits = precisionDigits {
             return .number.precision(digits)
         }
