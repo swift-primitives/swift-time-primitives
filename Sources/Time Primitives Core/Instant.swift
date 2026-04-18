@@ -67,6 +67,27 @@ extension Instant {
     }
 }
 
+// MARK: - Seconds-Only Initialization
+
+extension Instant {
+    /// Creates an instant from a whole-second Unix timestamp.
+    ///
+    /// Non-throwing: every `Int64` is a valid seconds-since-epoch value and
+    /// `nanosecondFraction` is fixed to zero, so there is no range to validate.
+    /// Use the `(secondsSinceUnixEpoch:nanosecondFraction:)` throwing init when
+    /// a sub-second fraction is required.
+    ///
+    /// - Parameter secondsSinceUnixEpoch: Whole seconds since 1970-01-01 UTC.
+    @inlinable
+    public init(secondsSinceUnixEpoch: Int64) {
+        self.init(
+            __unchecked: (),
+            secondsSinceUnixEpoch: secondsSinceUnixEpoch,
+            nanosecondFraction: 0
+        )
+    }
+}
+
 // MARK: - Conversions
 
 extension Instant {
