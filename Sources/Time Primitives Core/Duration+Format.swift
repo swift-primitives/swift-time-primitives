@@ -1,7 +1,7 @@
 // Duration+Format.swift
 // Duration formatting with auto-unit selection.
 
-public import Formatting_Primitives
+public import Format_Primitives
 
 extension Time {
     /// Format style for converting Duration values to human-readable strings.
@@ -207,7 +207,7 @@ extension Time.Format {
 
     /// Builds the appropriate `Format.Decimal` for the given value.
     @usableFromInline
-    func numericFormatStyle(for value: Double) -> Formatting_Primitives.Format.Decimal {
+    func numericFormatStyle(for value: Double) -> Format_Primitives.Format.Decimal {
         if let digits = precisionDigits {
             return .number.precision(digits)
         }

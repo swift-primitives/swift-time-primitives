@@ -34,14 +34,14 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "../swift-dimension-primitives"),
-        .package(path: "../swift-formatting-primitives"),
+        .package(path: "../swift-format-primitives"),
     ],
     targets: [
         // MARK: - Core
         .target(
             name: "Time Primitives Core",
             dependencies: [
-                .product(name: "Formatting Primitives", package: "swift-formatting-primitives"),
+                .product(name: "Format Primitives", package: "swift-format-primitives"),
             ]
         ),
 
