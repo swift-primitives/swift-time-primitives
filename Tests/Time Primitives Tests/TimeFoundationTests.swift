@@ -3,10 +3,13 @@
 //
 // Tests comparing Time package against Foundation.Date and Calendar
 
+// reason: cross-validates Time conversions against Foundation.Date/Calendar (test-only).
+// swiftlint:disable:next no_foundation_import_warning
 import Foundation
 import Testing
+import Time_Primitives
 
-@testable import Time_Primitives
+@testable import Time_Primitive
 
 @Suite
 struct `Time vs Foundation Comparison Tests` {
@@ -39,7 +42,7 @@ struct `Time vs Foundation Comparison Tests` {
             return nil
         }
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        calendar.timeZone = TimeZone.gmt
         return calendar.component(.weekday, from: date)
     }
 
@@ -59,7 +62,7 @@ struct `Time vs Foundation Comparison Tests` {
         // Compare with Foundation
         let foundationEpoch = Date(timeIntervalSince1970: 0)
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        calendar.timeZone = TimeZone.gmt
         let components = calendar.dateComponents(
             [.year, .month, .day, .hour, .minute, .second],
             from: foundationEpoch
@@ -213,7 +216,7 @@ struct `Time vs Foundation Comparison Tests` {
         // Compare with Foundation
         let foundationDate = Date(timeIntervalSince1970: TimeInterval(seconds))
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        calendar.timeZone = TimeZone.gmt
         let components = calendar.dateComponents(
             [.year, .month, .day, .hour, .minute, .second],
             from: foundationDate
@@ -398,7 +401,7 @@ struct `Time vs Foundation Comparison Tests` {
 
         // Foundation check - properly validate Feb 29 exists AND doesn't roll over
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        calendar.timeZone = TimeZone.gmt
 
         var components = DateComponents()
         components.year = year

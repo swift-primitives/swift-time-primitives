@@ -3,17 +3,20 @@
 //
 // Property-based tests comparing Time against Foundation across many values
 
+// reason: cross-validates Time conversions against Foundation.Date/Calendar (test-only).
+// swiftlint:disable:next no_foundation_import_warning
 import Foundation
 import Testing
+import Time_Primitives
 
-@testable import Time_Primitives
+@testable import Time_Primitive
 
 @Suite
 struct `Time Property-Based Tests` {
 
     // MARK: - Test Data Generation
 
-    /// Generate a range of test dates from 1970 to 2100
+    /// Generate a range of test dates from 1970 to 2100.
     static func generateTestDates() -> [(year: Int, month: Int, day: Int)] {
         var dates: [(Int, Int, Int)] = []
 
@@ -43,7 +46,7 @@ struct `Time Property-Based Tests` {
         return dates
     }
 
-    /// Generate random times throughout the day
+    /// Generate random times throughout the day.
     static func generateTestTimes() -> [(hour: Int, minute: Int, second: Int)] {
         [
             (0, 0, 0),  // Midnight
@@ -68,7 +71,7 @@ struct `Time Property-Based Tests` {
 
         // Get Foundation's epoch seconds
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        calendar.timeZone = TimeZone.gmt
 
         var components = DateComponents()
         components.year = year
@@ -122,7 +125,7 @@ struct `Time Property-Based Tests` {
 
         // Get Foundation's weekday
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        calendar.timeZone = TimeZone.gmt
 
         var components = DateComponents()
         components.year = year
@@ -180,7 +183,7 @@ struct `Time Property-Based Tests` {
 
         // Get Foundation's epoch seconds
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        calendar.timeZone = TimeZone.gmt
 
         var components = DateComponents()
         components.year = date.year
@@ -231,7 +234,7 @@ struct `Time Property-Based Tests` {
 
         // Get Foundation's days in month
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        calendar.timeZone = TimeZone.gmt
 
         var components = DateComponents()
         components.year = year
@@ -264,7 +267,7 @@ struct `Time Property-Based Tests` {
 
         // Foundation check - properly validate Feb 29 exists AND doesn't roll over
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        calendar.timeZone = TimeZone.gmt
 
         var components = DateComponents()
         components.year = year
@@ -312,7 +315,7 @@ struct `Time Property-Based Tests` {
                     let ourSeconds = Time.Epoch.Conversion.secondsSinceEpoch(from: time)
 
                     var calendar = Calendar(identifier: .gregorian)
-                    calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+                    calendar.timeZone = TimeZone.gmt
 
                     var components = DateComponents()
                     components.year = year

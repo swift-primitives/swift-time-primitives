@@ -4,8 +4,9 @@
 // Comprehensive tests for Time target with Foundation comparison
 
 import Testing
+import Time_Primitives
 
-@testable import Time_Primitives
+@testable import Time_Primitive
 
 @Suite
 struct `Time Exhaustive Tests` {

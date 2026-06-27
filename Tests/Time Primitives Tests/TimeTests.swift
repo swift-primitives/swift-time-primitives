@@ -4,8 +4,9 @@
 // Basic tests for Time target
 
 import Testing
+import Time_Primitives
 
-@testable import Time_Primitives
+@testable import Time_Primitive
 
 @Suite
 struct `Time Target Tests` {
