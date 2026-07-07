@@ -3,8 +3,6 @@
 //
 // Tests comparing Time package against Foundation.Date and Calendar
 
-// reason: cross-validates Time conversions against Foundation.Date/Calendar (test-only).
-// swiftlint:disable:next no_foundation_import_warning
 import Foundation
 import Testing
 import Time_Primitives
