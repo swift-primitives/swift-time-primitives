@@ -112,14 +112,14 @@ extension Time.Weekday {
         let y = Time.Year(year)
 
         let m: Time.Month
-        do {
+        do throws(Time.Month.Error) {
             m = try Time.Month(month)
         } catch {
             throw Error.invalidMonth(month)
         }
 
         let d: Time.Month.Day
-        do {
+        do throws(Time.Month.Day.Error) {
             d = try Time.Month.Day(day, in: m, year: y)
         } catch {
             throw Error.invalidDay(day, month: month, year: year)

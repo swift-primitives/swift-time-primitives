@@ -35,25 +35,27 @@ extension Time.Timezone {
                 hours * Time.Calendar.Gregorian.TimeConstants.secondsPerHour + sign * minutes
                 * Time.Calendar.Gregorian.TimeConstants.secondsPerMinute
         }
+    }
+}
 
-        /// UTC timezone offset (zero).
-        public static let utc = Self(seconds: 0)
+extension Time.Timezone.Offset {
+    /// UTC timezone offset (zero).
+    public static let utc = Self(seconds: 0)
 
-        /// Hour component of the offset.
-        public var hours: Int {
-            seconds / Time.Calendar.Gregorian.TimeConstants.secondsPerHour
-        }
+    /// Hour component of the offset.
+    public var hours: Int {
+        seconds / Time.Calendar.Gregorian.TimeConstants.secondsPerHour
+    }
 
-        /// Minute component of the offset (0-59).
-        public var minutes: Int {
-            abs(seconds % Time.Calendar.Gregorian.TimeConstants.secondsPerHour)
-                / Time.Calendar.Gregorian.TimeConstants.secondsPerMinute
-        }
+    /// Minute component of the offset (0-59).
+    public var minutes: Int {
+        abs(seconds % Time.Calendar.Gregorian.TimeConstants.secondsPerHour)
+            / Time.Calendar.Gregorian.TimeConstants.secondsPerMinute
+    }
 
-        /// Whether this is UTC (zero offset).
-        public var isUTC: Bool {
-            seconds == 0
-        }
+    /// Whether this is UTC (zero offset).
+    public var isUTC: Bool {
+        seconds == 0
     }
 }
 

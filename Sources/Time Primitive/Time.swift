@@ -135,56 +135,56 @@ extension Time {
         let y = Self.Year(year)
 
         let m: Self.Month
-        do {
+        do throws(Self.Month.Error) {
             m = try Self.Month(month)
         } catch {
             throw Error.monthOutOfRange(month)
         }
 
         let d: Self.Month.Day
-        do {
+        do throws(Self.Month.Day.Error) {
             d = try Self.Month.Day(day, in: m, year: y)
         } catch {
             throw Error.dayOutOfRange(day, month: month, year: year)
         }
 
         let h: Self.Hour
-        do {
+        do throws(Self.Hour.Error) {
             h = try Self.Hour(hour)
         } catch {
             throw Error.hourOutOfRange(hour)
         }
 
         let min: Self.Minute
-        do {
+        do throws(Self.Minute.Error) {
             min = try Self.Minute(minute)
         } catch {
             throw Error.minuteOutOfRange(minute)
         }
 
         let s: Self.Second
-        do {
+        do throws(Self.Second.Error) {
             s = try Self.Second(second)
         } catch {
             throw Error.secondOutOfRange(second)
         }
 
         let ms: Self.Millisecond
-        do {
+        do throws(Self.Millisecond.Error) {
             ms = try Self.Millisecond(millisecond)
         } catch {
             throw Error.millisecondOutOfRange(millisecond)
         }
 
         let us: Self.Microsecond
-        do {
+        do throws(Self.Microsecond.Error) {
             us = try Self.Microsecond(microsecond)
         } catch {
             throw Error.microsecondOutOfRange(microsecond)
         }
 
         let ns: Self.Nanosecond
-        do {
+        do throws(Self.Nanosecond.Error) {
             ns = try Self.Nanosecond(nanosecond)
         } catch {
             throw Error.nanosecondOutOfRange(nanosecond)

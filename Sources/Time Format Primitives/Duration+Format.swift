@@ -62,17 +62,19 @@ extension Time.Format {
         case milliseconds
         /// Display in seconds (s).
         case seconds
+    }
+}
 
-        /// The symbol for this unit.
-        @inlinable
-        public var symbol: String {
-            switch self {
-            case .auto: return ""
-            case .nanoseconds: return "ns"
-            case .microseconds: return "µs"
-            case .milliseconds: return "ms"
-            case .seconds: return "s"
-            }
+extension Time.Format.Unit {
+    /// The symbol for this unit.
+    @inlinable
+    public var symbol: String {
+        switch self {
+        case .auto: return ""
+        case .nanoseconds: return "ns"
+        case .microseconds: return "µs"
+        case .milliseconds: return "ms"
+        case .seconds: return "s"
         }
     }
 }
@@ -100,14 +102,16 @@ extension Time.Format {
         ///
         /// Example: "1.5ms", "500µs"
         case compactName
+    }
+}
 
-        /// The separator string between value and unit.
-        @inlinable
-        public var separator: String {
-            switch self {
-            case .spaced: return " "
-            case .compactName: return ""
-            }
+extension Time.Format.Notation {
+    /// The separator string between value and unit.
+    @inlinable
+    public var separator: String {
+        switch self {
+        case .spaced: return " "
+        case .compactName: return ""
         }
     }
 }
