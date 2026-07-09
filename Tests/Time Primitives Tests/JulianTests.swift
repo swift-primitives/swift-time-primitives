@@ -15,19 +15,19 @@ struct JulianTests {
     // MARK: - Constants
 
     @Test
-    func unixEpochConstant() {
+    func `unix Epoch Constant`() {
         let jd = Time.Julian.Day.unixEpoch
         #expect(jd.underlying == 2_440_587.5)
     }
 
     @Test
-    func j2000Constant() {
+    func `j2000 Constant`() {
         let jd = Time.Julian.Day.j2000
         #expect(jd.underlying == 2_451_545.0)
     }
 
     @Test
-    func modifiedOffsetConstant() {
+    func `modified Offset Constant`() {
         let offset = Time.Julian.Offset.modified
         #expect(offset.underlying == 2_400_000.5)
     }
@@ -35,7 +35,7 @@ struct JulianTests {
     // MARK: - Time → Julian Day
 
     @Test
-    func timeToJulianDayJ2000() throws {
+    func `time To Julian Day J2000`() throws {
         // J2000.0 is 2000-01-01 12:00:00 TT
         let time = try Time(year: 2000, month: 1, day: 1, hour: 12, minute: 0, second: 0)
         let jd = Time.Julian.Day(time)
@@ -43,7 +43,7 @@ struct JulianTests {
     }
 
     @Test
-    func timeToJulianDayUnixEpoch() throws {
+    func `time To Julian Day Unix Epoch`() throws {
         // Unix epoch is 1970-01-01 00:00:00
         let time = try Time(year: 1970, month: 1, day: 1, hour: 0, minute: 0, second: 0)
         let jd = Time.Julian.Day(time)
@@ -51,7 +51,7 @@ struct JulianTests {
     }
 
     @Test
-    func timeToJulianDayMidnight() throws {
+    func `time To Julian Day Midnight`() throws {
         // Midnight should be .5 fraction
         let time = try Time(year: 2024, month: 6, day: 15, hour: 0, minute: 0, second: 0)
         let jd = Time.Julian.Day(time)
@@ -60,7 +60,7 @@ struct JulianTests {
     }
 
     @Test
-    func timeToJulianDayNoon() throws {
+    func `time To Julian Day Noon`() throws {
         // Noon should be .0 fraction
         let time = try Time(year: 2024, month: 6, day: 15, hour: 12, minute: 0, second: 0)
         let jd = Time.Julian.Day(time)
@@ -71,7 +71,7 @@ struct JulianTests {
     // MARK: - Julian Day → Time
 
     @Test
-    func julianDayToTimeJ2000() throws {
+    func `julian Day To Time J2000`() throws {
         let jd = Time.Julian.Day.j2000
         let time = Time(jd)
         #expect(time.year.rawValue == 2000)
@@ -81,7 +81,7 @@ struct JulianTests {
     }
 
     @Test
-    func julianDayToTimeUnixEpoch() throws {
+    func `julian Day To Time Unix Epoch`() throws {
         let jd = Time.Julian.Day.unixEpoch
         let time = Time(jd)
         #expect(time.year.rawValue == 1970)
@@ -93,7 +93,7 @@ struct JulianTests {
     // MARK: - Round Trip
 
     @Test
-    func roundTripTimeToJulianDay() throws {
+    func `round Trip Time To Julian Day`() throws {
         let original = try Time(
             year: 2024,
             month: 7,
@@ -116,7 +116,7 @@ struct JulianTests {
     // MARK: - Affine Arithmetic
 
     @Test
-    func dayMinusDayEqualsOffset() {
+    func `day Minus Day Equals Offset`() {
         let jd1 = Time.Julian.Day.j2000
         let jd2 = Time.Julian.Day(2_451_546.0)
         let offset = jd2 - jd1
@@ -124,7 +124,7 @@ struct JulianTests {
     }
 
     @Test
-    func dayPlusOffsetEqualsDay() {
+    func `day Plus Offset Equals Day`() {
         let jd = Time.Julian.Day.j2000
         let offset = Time.Julian.Offset(10.0)
         let result = jd + offset
@@ -132,7 +132,7 @@ struct JulianTests {
     }
 
     @Test
-    func dayMinusOffsetEqualsDay() {
+    func `day Minus Offset Equals Day`() {
         let jd = Time.Julian.Day.j2000
         let offset = Time.Julian.Offset(10.0)
         let result = jd - offset
@@ -142,14 +142,14 @@ struct JulianTests {
     // MARK: - Modified Julian Day
 
     @Test
-    func modifiedJulianDayJ2000() {
+    func `modified Julian Day J2000`() {
         let jd = Time.Julian.Day.j2000
         let mjd = jd.modified
         #expect(abs(mjd - 51544.5) < 0.0001)
     }
 
     @Test
-    func modifiedJulianDayFromOffset() {
+    func `modified Julian Day From Offset`() {
         let jd = Time.Julian.Day.j2000
         let mjd = jd - .modified
         #expect(abs(mjd.underlying - 51544.5) < 0.0001)
@@ -159,7 +159,7 @@ struct JulianTests {
 
     @available(macOS 13.0, iOS 16.0, tvOS 16.0, watchOS 9.0, *)
     @Test
-    func instantToJulianDay() throws {
+    func `instant To Julian Day`() throws {
         let instant = try Instant(secondsSinceUnixEpoch: 0)
         let jd = Time.Julian.Day(instant)
         #expect(abs(jd.underlying - 2_440_587.5) < 0.0001)
@@ -167,7 +167,7 @@ struct JulianTests {
 
     @available(macOS 13.0, iOS 16.0, tvOS 16.0, watchOS 9.0, *)
     @Test
-    func julianDayToInstant() throws {
+    func `julian Day To Instant`() throws {
         let jd = Time.Julian.Day.unixEpoch
         let instant = Instant(jd)
         #expect(instant.secondsSinceUnixEpoch == 0)
@@ -175,7 +175,7 @@ struct JulianTests {
 
     @available(macOS 13.0, iOS 16.0, tvOS 16.0, watchOS 9.0, *)
     @Test
-    func instantRoundTrip() throws {
+    func `instant Round Trip`() throws {
         let original = try Instant(secondsSinceUnixEpoch: 1_000_000_000, nanosecondFraction: 500_000_000)
         let jd = Time.Julian.Day(original)
         let restored = Instant(jd)
