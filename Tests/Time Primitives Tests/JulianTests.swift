@@ -9,8 +9,10 @@ import Time_Primitives
 
 @testable import Time_Primitive
 
-@Suite
-struct JulianTests {
+extension Time.Julian {
+
+    @Suite
+    struct Test {
 
     // MARK: - Constants
 
@@ -184,5 +186,6 @@ struct JulianTests {
         // Note: precision loss expected due to Double's ~15 significant digits
         // For large JD values, nanosecond precision is limited
         #expect(abs(restored.nanosecondFraction - original.nanosecondFraction) < 100_000)
+    }
     }
 }
