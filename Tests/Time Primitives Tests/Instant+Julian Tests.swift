@@ -52,8 +52,7 @@ extension Instant.Tests.`Edge Case` {
 
     @available(macOS 13.0, iOS 16.0, tvOS 16.0, watchOS 9.0, *)
     @Test
-    func `Instant throwing initializer accepts the nanosecondFraction produced from a pre-1970 Julian Day`(
-    ) throws {
+    func `Instant throwing initializer accepts the nanosecondFraction produced from a pre-1970 Julian Day`() throws {
         // The whole point of the invariant: a value that round-trips through the
         // type's own validating initializer without throwing.
         let julianDay = Time.Julian.Day.unixEpoch - Time.Julian.Offset(10.75)
