@@ -49,9 +49,24 @@ extension Instant {
         let secondsPerDay: Double = 86400.0
         let totalSeconds = days * secondsPerDay
 
-        let wholeSeconds = Int64(totalSeconds)
-        let fractionalSeconds = totalSeconds - Double(wholeSeconds)
-        let nanoseconds = Int32(fractionalSeconds * 1_000_000_000)
+        // Floored decomposition: `wholeSeconds` is the largest integer <= totalSeconds, so
+        // `fractionalSeconds` (and therefore `nanoseconds`) is always in [0, 1) / [0, 1e9),
+        // matching `Instant.nanosecondFraction`'s documented invariant (0..<1_000_000_000)
+        // even for pre-1970 (negative) Julian Days. `Int64(totalSeconds)` (the previous
+        // behavior) truncates *toward zero*, which for negative `totalSeconds` rounds up
+        // instead of down, leaving a negative fractional remainder and therefore a negative
+        // `nanosecondFraction` - an invalid `Instant` that bypasses the type's own
+        // range-checked initializer via `_unchecked`.
+        let flooredSeconds = totalSeconds.rounded(.down)
+        let wholeSeconds = Int64(flooredSeconds)
+        let fractionalSeconds = totalSeconds - flooredSeconds  // mathematically in [0, 1)
+
+        // Clamp for floating-point edge cases (fractionalSeconds landing a hair outside
+        // [0, 1) due to Double rounding, e.g. for very large-magnitude Julian Days) so the
+        // invariant holds exactly rather than merely "usually".
+        let nanoseconds = Int32(
+            min(max(fractionalSeconds * 1_000_000_000, 0), 999_999_999)
+        )
 
         return Instant(
             _unchecked: (),
