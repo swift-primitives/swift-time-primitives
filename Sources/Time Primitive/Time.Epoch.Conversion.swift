@@ -58,12 +58,24 @@ extension Time.Epoch.Conversion {
     /// Extracts date-time components from seconds since epoch (internal).
     ///
     /// Returns raw tuple with values guaranteed valid by algorithmic construction.
+    ///
+    /// Uses a floored (Euclidean) day/second split so that pre-1970 (negative)
+    /// `secondsSinceEpoch` values decompose correctly: `secondsInDay` is always in
+    /// `[0, secondsPerDay)`, never negative. Swift's native `/` and `%` truncate
+    /// toward zero, which would otherwise yield a negative `secondsInDay` for
+    /// negative input.
     @inlinable
     package static func componentsRaw(
         fromSecondsSinceEpoch secondsSinceEpoch: Int
     ) -> (year: Int, month: Int, day: Int, hour: Int, minute: Int, second: Int) {
-        let totalDays = secondsSinceEpoch / Time.Calendar.Gregorian.TimeConstants.secondsPerDay
-        let secondsInDay = secondsSinceEpoch % Time.Calendar.Gregorian.TimeConstants.secondsPerDay
+        let totalDays = floorDiv(
+            secondsSinceEpoch,
+            Time.Calendar.Gregorian.TimeConstants.secondsPerDay
+        )
+        let secondsInDay = floorMod(
+            secondsSinceEpoch,
+            Time.Calendar.Gregorian.TimeConstants.secondsPerDay
+        )
 
         let hour = secondsInDay / Time.Calendar.Gregorian.TimeConstants.secondsPerHour
         let minute =
@@ -96,64 +108,58 @@ extension Time.Epoch.Conversion {
 // MARK: - Year and Days Calculation (Internal)
 
 extension Time.Epoch.Conversion {
-    /// Calculates year and remaining days from days since epoch (internal).
+    /// Number of days from the proleptic-Gregorian "computational epoch" (0000-03-01) to
+    /// the Unix epoch (1970-01-01).
     ///
-    /// O(1) algorithm using Gregorian calendar's 400-year cycle structure (exactly 146,097 days).
+    /// `yearAndDays` below starts its computational year on March 1 rather than January 1.
+    /// A year that starts on March 1 always ends with Feb 28/29 as its *last* day, so the
+    /// leap day is the final day of every 4-year/100-year/400-year block instead of the
+    /// first — which means a block is never "deficient" partway through, unlike a
+    /// January-anchored decomposition. (A January-anchored version of this same cycle
+    /// arithmetic has a bug: the four years immediately following a non-x400 century
+    /// boundary, e.g. 1900-1904 or 2100-2104, form a 1460-day block with zero leap days,
+    /// not the uniform 1461 assumed by dividing by `daysPer4Years` — silently producing
+    /// wrong dates for roughly a third of all years once corrected for symmetry.)
+    @usableFromInline
+    package static let daysFromComputationalEpochToUnixEpoch = 719468
+
+    /// Calculates year and remaining days (from January 1 of that year) from days since
+    /// the Unix epoch (internal).
+    ///
+    /// O(1) algorithm using Gregorian calendar's 400-year cycle structure (exactly 146,097
+    /// days), correct for the full `Int` domain including negative `days` (pre-1970 dates).
+    ///
+    /// Algorithm: Howard Hinnant, "chrono-Compatible Low-Level Date Algorithms",
+    /// `civil_from_days` (<http://howardhinnant.github.io/date_algorithms.html>, public
+    /// domain; the same algorithm used by LLVM libc++'s `<chrono>`). The March-1
+    /// computational-year shift (see `daysFromComputationalEpochToUnixEpoch`) is what
+    /// makes this correct across century boundaries in both directions, unlike a
+    /// January-anchored cycle decomposition.
     @inlinable
     package static func yearAndDays(
         fromDaysSinceEpoch days: Int
     ) -> (year: Int, remainingDays: Int) {
-        // Gregorian calendar has a 400-year cycle with exactly 146097 days
-        // This cycle contains: 97 leap years and 303 common years
-        let cyclesOf400 = days / Time.Calendar.Gregorian.TimeConstants.daysPer400Years
-        var remainingDays = days % Time.Calendar.Gregorian.TimeConstants.daysPer400Years
+        let z = days + daysFromComputationalEpochToUnixEpoch
 
-        // Within each 400-year cycle, 100-year periods vary:
-        // - First 3 periods: 36524 days each (24 leap years, 76 common years)
-        // - Last period: 36525 days (25 leap years because year x400 is always a leap year)
-        // However, since 1970 is 30 years into a cycle, we need special handling
+        let era = floorDiv(z, Time.Calendar.Gregorian.TimeConstants.daysPer400Years)
+        let dayOfEra = z - era * Time.Calendar.Gregorian.TimeConstants.daysPer400Years  // [0, 146096]
+        let yearOfEra =
+            (dayOfEra - dayOfEra / 1460 + dayOfEra / 36524 - dayOfEra / 146096) / 365  // [0, 399]
+        let computationalYear = yearOfEra + era * 400
 
-        // For epoch 1970, we're 30 years into the 1600-2000 cycle
-        // So the relevant centuries starting from 1970 are: 2000, 2100, 2200, 2300...
-        // 2000 is divisible by 400 (leap year), so 1970-2069 has 25 leap years = 36525 days
-        // 2100, 2200, 2300 are not divisible by 400, so they have 24 leap years = 36524 days each
+        // Day of the March-1-started computational year, [0, 365].
+        let dayOfComputationalYear = dayOfEra - (365 * yearOfEra + yearOfEra / 4 - yearOfEra / 100)
+        let shiftedMonth = (5 * dayOfComputationalYear + 2) / 153  // [0, 11], 0 = March
+        let day = dayOfComputationalYear - (153 * shiftedMonth + 2) / 5 + 1  // [1, 31]
+        let month = shiftedMonth < 10 ? shiftedMonth + 3 : shiftedMonth - 9  // [1, 12]
+        let year = month <= 2 ? computationalYear + 1 : computationalYear
 
-        var cyclesOf100: Int
-        if remainingDays >= 36525 {  // First century (1970-2070) includes year 2000
-            cyclesOf100 = 1
-            remainingDays -= 36525
-            // Add remaining centuries (each 36524 days)
-            let additionalCenturies = min(
-                remainingDays / Time.Calendar.Gregorian.TimeConstants.daysPer100Years,
-                2
-            )  // Max 2 more (to stay within 400-year cycle)
-            cyclesOf100 += additionalCenturies
-            remainingDays -=
-                additionalCenturies * Time.Calendar.Gregorian.TimeConstants.daysPer100Years
-        } else {
-            cyclesOf100 = 0
-        }
-
-        // Within each 100-year period, 4-year periods have 1461 days
-        // (1 leap year, 3 common years)
-        // We use min(_, 24) to stay within the 100-year boundary
-        let cyclesOf4 = min(remainingDays / Time.Calendar.Gregorian.TimeConstants.daysPer4Years, 24)
-        remainingDays -= cyclesOf4 * Time.Calendar.Gregorian.TimeConstants.daysPer4Years
-
-        // Handle remaining 0-3 years, accounting for possible leap year
-        var year = 1970 + cyclesOf400 * 400 + cyclesOf100 * 100 + cyclesOf4 * 4
-
-        // Process up to 3 remaining years
-        for _ in 0..<3 {
-            let daysInYear =
-                Time.Calendar.Gregorian.isLeapYear(year)
-                ? Time.Calendar.Gregorian.TimeConstants
-                    .daysPerLeapYear : Time.Calendar.Gregorian.TimeConstants.daysPerCommonYear
-            if remainingDays < daysInYear {
-                break
-            }
-            remainingDays -= daysInYear
-            year += 1
+        // Re-express as days since January 1 of the (calendar, not computational) year, to
+        // match this function's existing January-anchored contract.
+        let monthDays = Time.Calendar.Gregorian.daysInMonths(year: year)
+        var remainingDays = day - 1
+        for m in 0..<(month - 1) {
+            remainingDays += monthDays[m]
         }
 
         return (year, remainingDays)
@@ -163,9 +169,25 @@ extension Time.Epoch.Conversion {
 // MARK: - Days Since Epoch Calculation (Internal)
 
 extension Time.Epoch.Conversion {
+    /// Number of leap years strictly before the start of `year` (i.e. in `[.., year - 1]`),
+    /// using the proleptic Gregorian rule (divisible by 4, except centuries, except
+    /// again multiples of 400).
+    ///
+    /// Uses floored division throughout so the count is correct for negative `year`
+    /// too (Swift's native `/` truncates toward zero, which silently miscounts leap
+    /// years for negative dividends).
+    @inlinable
+    package static func leapYearsBefore(_ year: Int) -> Int {
+        let y = year - 1
+        return floorDiv(y, 4) - floorDiv(y, 100) + floorDiv(y, 400)
+    }
+
     /// Calculates days since Unix epoch for a given date (internal).
     ///
     /// O(1) algorithm using leap year counting formula (no year-by-year iteration).
+    /// Correct for years before 1970 as well as after: the leap-year count is expressed
+    /// as a symmetric difference (`leapYearsBefore(year) - leapYearsBefore(1970)`), which
+    /// is negative when `year < 1970`, exactly compensating `yearsSince1970` being negative.
     @inlinable
     package static func daysSinceEpoch(
         year: Time.Year,
@@ -175,17 +197,9 @@ extension Time.Epoch.Conversion {
         // Optimized calculation avoiding year-by-year iteration
         let yearsSince1970 = year.rawValue - 1970
 
-        // Calculate leap years between 1970 and year (exclusive)
-        // Count years divisible by 4, subtract those divisible by 100, add back those divisible by 400
-        let leapYears: Int
-        if yearsSince1970 > 0 {
-            let yearBefore = year.rawValue - 1
-            leapYears =
-                (yearBefore / 4 - 1970 / 4) - (yearBefore / 100 - 1970 / 100)
-                + (yearBefore / 400 - 1970 / 400)
-        } else {
-            leapYears = 0
-        }
+        // Calculate leap years between 1970 and year (as a signed difference, so it is
+        // correct whether `year` is before or after 1970).
+        let leapYears = leapYearsBefore(year.rawValue) - leapYearsBefore(1970)
 
         var days =
             yearsSince1970 * Time.Calendar.Gregorian.TimeConstants.daysPerCommonYear + leapYears
@@ -201,5 +215,33 @@ extension Time.Epoch.Conversion {
         days += day.rawValue - 1
 
         return days
+    }
+}
+
+// MARK: - Floored Division (Internal)
+
+extension Time.Epoch.Conversion {
+    /// Floored (Euclidean-style) integer division: rounds toward negative infinity
+    /// rather than toward zero.
+    ///
+    /// Swift's native `/` truncates toward zero, which is the wrong split for negative
+    /// dividends in a day/second or year/day decomposition (it would put the remainder
+    /// on the wrong side of zero). `divisor` is always a positive calendar constant
+    /// (`secondsPerDay`, `daysPer400Years`, `4`, `100`, `400`, ...) in every call site
+    /// in this file.
+    @inlinable
+    package static func floorDiv(_ dividend: Int, _ divisor: Int) -> Int {
+        let quotient = dividend / divisor
+        let remainder = dividend % divisor
+        return remainder < 0 ? quotient - 1 : quotient
+    }
+
+    /// Floored (Euclidean-style) integer remainder: always has the same sign as
+    /// (non-negative, given) `divisor`, unlike Swift's native `%` which has the same
+    /// sign as the dividend.
+    @inlinable
+    package static func floorMod(_ dividend: Int, _ divisor: Int) -> Int {
+        let remainder = dividend % divisor
+        return remainder < 0 ? remainder + divisor : remainder
     }
 }
