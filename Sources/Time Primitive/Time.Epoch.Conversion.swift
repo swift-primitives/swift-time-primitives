@@ -169,7 +169,7 @@ extension Time.Epoch.Conversion {
 // MARK: - Days Since Epoch Calculation (Internal)
 
 extension Time.Epoch.Conversion {
-    /// Number of leap years strictly before the start of `year` (i.e. in `[.., year - 1]`),
+    /// Number of leap years strictly before the start of `year` (that is, in `[.., year - 1]`),
     /// using the proleptic Gregorian rule (divisible by 4, except centuries, except
     /// again multiples of 400).
     ///
