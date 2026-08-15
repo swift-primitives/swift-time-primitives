@@ -142,7 +142,8 @@ extension Time.Epoch.Conversion {
         let z = days + daysFromComputationalEpochToUnixEpoch
 
         let era = floorDiv(z, Time.Calendar.Gregorian.TimeConstants.daysPer400Years)
-        let dayOfEra = z - era * Time.Calendar.Gregorian.TimeConstants.daysPer400Years  // [0, 146096]
+        // [0, 146096]
+        let dayOfEra = z - era * Time.Calendar.Gregorian.TimeConstants.daysPer400Years
         let yearOfEra =
             (dayOfEra - dayOfEra / 1460 + dayOfEra / 36524 - dayOfEra / 146096) / 365  // [0, 399]
         let computationalYear = yearOfEra + era * 400

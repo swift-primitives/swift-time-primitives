@@ -142,7 +142,8 @@ extension Time.Epoch.Conversion.Tests.`Edge Case` {
 
     @Test(
         arguments: [
-            -900_690,  // -497-12-31 (last day of a non-leap century-skip year, computed via Foundation-independent reference)
+            // -497-12-31 (last day of a non-leap century-skip year, computed via Foundation-independent reference)
+            -900_690,
             -900_689,  // -496-01-01 (first day of the following year)
         ]
     )
@@ -154,7 +155,10 @@ extension Time.Epoch.Conversion.Tests.`Edge Case` {
         let (year, month, day, _, _, _) = Time.Epoch.Conversion.componentsRaw(
             fromSecondsSinceEpoch: seconds
         )
-        #expect((1...12).contains(month), "month=\(month) out of range for computed year=\(year) day=\(day)")
+        #expect(
+            (1...12).contains(month),
+            "month=\(month) out of range for computed year=\(year) day=\(day)"
+        )
     }
 
     @Test

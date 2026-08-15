@@ -439,11 +439,6 @@ extension Time {
 #if !hasFeature(Embedded)
     @available(macOS 13.0, iOS 16.0, tvOS 16.0, watchOS 9.0, *)
     extension Time: Codable {
-        // swiftlint:disable no_any_protocol_existential typed_throws_required
-        // reason: Codable witnesses must match the stdlib-declared signatures
-        //   `init(from: any Decoder) throws` and `encode(to: any Encoder) throws`;
-        //   neither the existential parameter nor the untyped throw is ours to change.
-
         /// Creates a time by decoding an `Instant` from the given decoder.
         public init(from decoder: any Decoder) throws {
             let instant = try Instant(from: decoder)
@@ -454,7 +449,5 @@ extension Time {
         public func encode(to encoder: any Encoder) throws {
             try Instant(self).encode(to: encoder)
         }
-
-        // swiftlint:enable no_any_protocol_existential typed_throws_required
     }
 #endif

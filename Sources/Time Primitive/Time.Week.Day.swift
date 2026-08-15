@@ -82,11 +82,11 @@ extension Time.Weekday {
         }
 
         let q = day.rawValue
-        let K = y % 100
-        let J = y / 100
+        let k = y % 100
+        let j = y / 100
 
         // Zeller's formula
-        let h = (q + ((13 * (m + 1)) / 5) + K + (K / 4) + (J / 4) - (2 * J)) % 7
+        let h = (q + ((13 * (m + 1)) / 5) + k + (k / 4) + (j / 4) - (2 * j)) % 7
 
         // Convert from Zeller's (0=Saturday) to Gregorian (0=Sunday)
         // Modulo 7 always returns 0-6, so this switch is exhaustive
