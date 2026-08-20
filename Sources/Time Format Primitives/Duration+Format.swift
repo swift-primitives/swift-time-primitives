@@ -2,7 +2,7 @@
 // Duration formatting with auto-unit selection.
 
 public import Format_Primitives
-public import Formatter_Primitives
+import Formatter_Primitives
 public import Time_Primitive
 
 extension Time {
