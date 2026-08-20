@@ -1,5 +1,13 @@
-// Duration+Format.swift
-// Duration formatting with auto-unit selection.
+// ===----------------------------------------------------------------------===//
+//
+// This source file is part of the swift-primitives open source project
+//
+// Copyright (c) 2024-2026 Coen ten Thije Boonkkamp and the swift-primitives project authors
+// Licensed under Apache License v2.0
+//
+// See LICENSE for license information
+//
+// ===----------------------------------------------------------------------===//
 
 public import Format_Primitives
 import Formatter_Primitives
@@ -211,11 +219,12 @@ extension Time.Format {
 
         case .auto:
             let seconds = duration.inSeconds
-            if seconds < 0.000001 {
+            let magnitude = abs(seconds)
+            if magnitude < 0.000001 {
                 return (duration.inNanoseconds, Unit.nanoseconds.symbol)
-            } else if seconds < 0.001 {
+            } else if magnitude < 0.001 {
                 return (duration.inMicroseconds, Unit.microseconds.symbol)
-            } else if seconds < 1.0 {
+            } else if magnitude < 1.0 {
                 return (duration.inMilliseconds, Unit.milliseconds.symbol)
             } else {
                 return (seconds, Unit.seconds.symbol)
