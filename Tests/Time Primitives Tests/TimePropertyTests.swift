@@ -1,8 +1,3 @@
-// TimePropertyTests.swift
-// Time Tests
-//
-// Property-based tests comparing Time against Foundation across many values
-
 import Foundation
 import Testing
 import Time_Primitives
@@ -12,13 +7,9 @@ import Time_Primitives
 @Suite
 struct `Time Property-Based Tests` {
 
-    // MARK: - Test Data Generation
-
-    /// Generate a range of test dates from 1970 to 2100.
     static func generateTestDates() -> [(year: Int, month: Int, day: Int)] {
         var dates: [(Int, Int, Int)] = []
 
-        // Test every month boundary in multiple years
         let testYears = [
             1970, 1971, 1980, 1990, 1999, 2000, 2001, 2004, 2010, 2020, 2023, 2024, 2025, 2030,
             2038, 2040, 2050, 2060, 2070, 2080, 2090, 2099, 2100,
@@ -31,7 +22,7 @@ struct `Time Property-Based Tests` {
                 : [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
             for month in 1...12 {
-                // Test first day, middle day, and last day of each month
+
                 let maxDay = daysInMonths[month - 1]
                 let testDays = [1, maxDay / 2, maxDay]
 
@@ -44,18 +35,15 @@ struct `Time Property-Based Tests` {
         return dates
     }
 
-    /// Generate random times throughout the day.
     static func generateTestTimes() -> [(hour: Int, minute: Int, second: Int)] {
         [
-            (0, 0, 0),  // Midnight
-            (6, 30, 15),  // Morning
-            (12, 0, 0),  // Noon
-            (18, 45, 30),  // Evening
-            (23, 59, 59),  // End of day
+            (0, 0, 0),
+            (6, 30, 15),
+            (12, 0, 0),
+            (18, 45, 30),
+            (23, 59, 59),
         ]
     }
-
-    // MARK: - Epoch Conversion Property Tests
 
     @Test(
         arguments: generateTestDates()
@@ -63,10 +51,8 @@ struct `Time Property-Based Tests` {
     func `Property: Epoch conversion matches Foundation`(year: Int, month: Int, day: Int) throws {
         let time = try Time(year: year, month: month, day: day, hour: 0, minute: 0, second: 0)
 
-        // Get our epoch seconds
         let ourSeconds = Time.Epoch.Conversion.secondsSinceEpoch(from: time)
 
-        // Get Foundation's epoch seconds
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone.gmt
 
@@ -98,7 +84,6 @@ struct `Time Property-Based Tests` {
     func `Property: Epoch round-trip matches original`(year: Int, month: Int, day: Int) throws {
         let original = try Time(year: year, month: month, day: day, hour: 0, minute: 0, second: 0)
 
-        // Convert to epoch and back
         let epochSeconds = Time.Epoch.Conversion.secondsSinceEpoch(from: original)
         let roundTrip = Time(secondsSinceEpoch: epochSeconds)
 
@@ -110,8 +95,6 @@ struct `Time Property-Based Tests` {
         #expect(roundTrip.second.value == original.second.value)
     }
 
-    // MARK: - Weekday Property Tests
-
     @Test(
         arguments: generateTestDates()
     )
@@ -119,7 +102,6 @@ struct `Time Property-Based Tests` {
     {
         let weekday = try Time.Weekday(year: year, month: month, day: day)
 
-        // Get Foundation's weekday
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone.gmt
 
@@ -136,7 +118,6 @@ struct `Time Property-Based Tests` {
 
         let foundationWeekdayValue = calendar.component(.weekday, from: foundationDate)
 
-        // Convert Foundation weekday (1=Sunday) to our enum
         let foundationWeekday: Time.Weekday
         switch foundationWeekdayValue {
         case 1: foundationWeekday = .sunday
@@ -155,8 +136,6 @@ struct `Time Property-Based Tests` {
         )
     }
 
-    // MARK: - Comprehensive Date-Time Property Tests
-
     @Test(
         arguments: zip(generateTestDates(), generateTestTimes()).map { ($0.0, $0.1) }
     )
@@ -173,10 +152,8 @@ struct `Time Property-Based Tests` {
             second: time.second
         )
 
-        // Get our epoch seconds
         let ourSeconds = Time.Epoch.Conversion.secondsSinceEpoch(from: ourTime)
 
-        // Get Foundation's epoch seconds
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone.gmt
 
@@ -203,7 +180,6 @@ struct `Time Property-Based Tests` {
             "Epoch mismatch for \(date.year)-\(date.month)-\(date.day) \(time.hour):\(time.minute):\(time.second)"
         )
 
-        // Also verify round-trip
         let roundTrip = Time(secondsSinceEpoch: ourSeconds)
         #expect(roundTrip.year.rawValue == date.year)
         #expect(roundTrip.month == date.month)
@@ -212,8 +188,6 @@ struct `Time Property-Based Tests` {
         #expect(roundTrip.minute.value == time.minute)
         #expect(roundTrip.second.value == time.second)
     }
-
-    // MARK: - Days in Month Property Tests
 
     @Test(
         arguments: Array(1970...2100).flatMap { year in
@@ -226,7 +200,6 @@ struct `Time Property-Based Tests` {
             Time.Month(unchecked: month)
         )
 
-        // Get Foundation's days in month
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone.gmt
 
@@ -250,15 +223,12 @@ struct `Time Property-Based Tests` {
         )
     }
 
-    // MARK: - Leap Year Property Tests
-
     @Test(
         arguments: Array(1900...2400)
     )
     func `Property: Leap year matches Foundation`(year: Int) {
         let ourResult = Time.Calendar.Gregorian.isLeapYear(Time.Year(year))
 
-        // Foundation check - properly validate Feb 29 exists AND doesn't roll over
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone.gmt
 
@@ -267,7 +237,6 @@ struct `Time Property-Based Tests` {
         components.month = 2
         components.day = 29
 
-        // Create date and verify it's actually Feb 29 (not rolled to Mar 1)
         let foundationResult: Bool
         if let date = calendar.date(from: components) {
             let resultComponents = calendar.dateComponents([.year, .month, .day], from: date)
@@ -284,8 +253,6 @@ struct `Time Property-Based Tests` {
             "Leap year mismatch for \(year): ours=\(ourResult) foundation=\(foundationResult)"
         )
     }
-
-    // MARK: - Exhaustive Range Tests
 
     @Test
     func `Property: Every day from 2020-2024 matches Foundation`() throws {
@@ -333,7 +300,6 @@ struct `Time Property-Based Tests` {
                         "Mismatch on \(year)-\(month)-\(day)"
                     )
 
-                    // Verify weekday too
                     let weekday = try Time.Weekday(year: year, month: month, day: day)
                     let foundationWeekdayValue = calendar.component(.weekday, from: foundationDate)
 

@@ -1,44 +1,18 @@
-// Time.Calendar.Gregorian.Easter.swift
-// Time
-//
-// Easter date computation via Anonymous Gregorian algorithm (Meeus/Jones/Butcher)
-
 extension Time.Calendar.Gregorian {
-    /// Easter date computation namespace.
-    ///
-    /// Provides the Anonymous Gregorian algorithm (Meeus/Jones/Butcher) for
-    /// computing Easter Sunday in the Gregorian calendar. O(1) pure arithmetic.
+
     public enum Easter {}
 }
 
-// MARK: - Error
-
 extension Time.Calendar.Gregorian.Easter {
-    /// Validation errors for Easter computation.
+
     public enum Error: Swift.Error, Sendable, Equatable {
-        /// Year is before Gregorian calendar adoption (1583)
+
         case yearOutOfRange(Int)
     }
 }
 
-// MARK: - Computation
-
 extension Time.Calendar.Gregorian {
-    /// Easter Sunday for a Gregorian calendar year.
-    ///
-    /// Anonymous Gregorian algorithm (Meeus/Jones/Butcher). O(1) pure arithmetic.
-    /// Valid for any year ≥ 1583 (Gregorian calendar adoption).
-    ///
-    /// ## Example
-    ///
-    /// ```swift
-    /// let (month, day) = try Time.Calendar.Gregorian.easter(year: 2024)
-    /// // month == .march, day.rawValue == 31
-    /// ```
-    ///
-    /// - Parameter year: Gregorian calendar year (must be ≥ 1583)
-    /// - Returns: Month and day of Easter Sunday
-    /// - Throws: `Easter.Error.yearOutOfRange` if year < 1583
+
     public static func easter(
         year: Time.Year
     ) throws(Easter.Error) -> (month: Time.Month, day: Time.Month.Day) {
@@ -63,7 +37,6 @@ extension Time.Calendar.Gregorian {
         let monthRaw = (h + l - 7 * m + 114) / 31
         let dayRaw = ((h + l - 7 * m + 114) % 31) + 1
 
-        // SAFE: Algorithm guarantees month ∈ {3, 4} and day is valid for the month
         let month = Time.Month(unchecked: monthRaw)
         let day = Time.Month.Day(unchecked: dayRaw)
 

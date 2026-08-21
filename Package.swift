@@ -12,22 +12,22 @@ let package = Package(
         .visionOS(.v27),
     ],
     products: [
-        // MARK: - Namespace + foundational types (per [MOD-017])
+
         .library(
             name: "Time Primitive",
             targets: ["Time Primitive"]
         ),
-        // MARK: - Sub-namespaces (per [MOD-031])
+
         .library(
             name: "Time Format Primitives",
             targets: ["Time Format Primitives"]
         ),
-        // MARK: - Variants
+
         .library(
             name: "Time Julian Primitives",
             targets: ["Time Julian Primitives"]
         ),
-        // MARK: - Umbrella
+
         .library(
             name: "Time Primitives",
             targets: ["Time Primitives"]
@@ -52,13 +52,12 @@ let package = Package(
         ),
     ],
     targets: [
-        // MARK: - Namespace + foundational types (per [MOD-017]; zero external deps — the invariant)
+
         .target(
             name: "Time Primitive",
             dependencies: []
         ),
 
-        // MARK: - Sub-namespaces (per [MOD-031])
         .target(
             name: "Time Format Primitives",
             dependencies: [
@@ -68,7 +67,6 @@ let package = Package(
             ]
         ),
 
-        // MARK: - Variants
         .target(
             name: "Time Julian Primitives",
             dependencies: [
@@ -77,7 +75,6 @@ let package = Package(
             ]
         ),
 
-        // MARK: - Umbrella
         .target(
             name: "Time Primitives",
             dependencies: [
@@ -87,7 +84,6 @@ let package = Package(
             ]
         ),
 
-        // MARK: - Tests
         .testTarget(
             name: "Time Primitives Tests",
             dependencies: [
@@ -96,7 +92,6 @@ let package = Package(
             ]
         ),
 
-        // MARK: - Test Support
         .target(
             name: "Time Primitives Test Support",
             dependencies: [

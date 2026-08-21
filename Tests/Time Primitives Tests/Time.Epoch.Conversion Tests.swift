@@ -1,11 +1,3 @@
-// Time.Epoch.Conversion Tests.swift
-// Time Primitives Tests
-//
-// Regression tests for fable-448 F-001: epoch conversion silently produced invalid or
-// wrong values for all pre-1970 timestamps (negative `secondsSinceEpoch` / negative
-// `year`). Follows [INST-TEST-013]: an @Suite subdomain extension of the affected
-// source type, with tests nested under the `Edge Case` sub-suite.
-
 import Foundation
 import Testing
 
@@ -21,7 +13,6 @@ extension Time.Epoch.Conversion {
 
 extension Time.Epoch.Conversion.Tests.`Edge Case` {
 
-    // Helper to create a Foundation Date from calendar components in UTC.
     private func foundationDate(
         year: Int,
         month: Int,
@@ -41,20 +32,18 @@ extension Time.Epoch.Conversion.Tests.`Edge Case` {
         return Calendar(identifier: .gregorian).date(from: components)
     }
 
-    // MARK: - Pre-1970 dates vs Foundation (previously disabled; F-001 primary evidence)
-
     @Test(
         arguments: [
-            (1969, 12, 31),  // Day before epoch
-            (1969, 1, 1),  // Start of 1969
-            (1960, 1, 1),  // Start of 1960s
-            (1950, 1, 1),  // Mid-century
-            (1945, 5, 8),  // VE Day
-            (1920, 1, 1),  // Roaring Twenties
-            (1900, 1, 1),  // Century boundary, non-leap century
-            (1800, 1, 1),  // Century boundary, non-leap century
-            (1700, 1, 1),  // Century boundary, non-leap century
-            (1600, 1, 1),  // Century boundary, leap century (÷400)
+            (1969, 12, 31),
+            (1969, 1, 1),
+            (1960, 1, 1),
+            (1950, 1, 1),
+            (1945, 5, 8),
+            (1920, 1, 1),
+            (1900, 1, 1),
+            (1800, 1, 1),
+            (1700, 1, 1),
+            (1600, 1, 1),
         ]
     )
     func `secondsSinceEpoch matches Foundation for dates before 1970`(
@@ -96,12 +85,9 @@ extension Time.Epoch.Conversion.Tests.`Edge Case` {
         #expect(roundTrip.day.rawValue == day)
     }
 
-    // MARK: - Symmetric leap-year counting (daysSinceEpoch, package API)
-
     @Test
     func `daysSinceEpoch counts the leap day for 1968 when going backward from 1970`() throws {
-        // 1968 is a leap year (366 days), 1969 is not (365 days), so 1968-01-01 is
-        // exactly 731 days before 1970-01-01.
+
         let year: Time.Year = 1968
         let month = try Time.Month(1)
         let days = Time.Epoch.Conversion.daysSinceEpoch(
@@ -114,8 +100,7 @@ extension Time.Epoch.Conversion.Tests.`Edge Case` {
 
     @Test
     func `daysSinceEpoch is antisymmetric around 1970 for a non-leap-affected span`() throws {
-        // 1971-01-01 is +365 days from epoch; 1969-01-01 is -365 days (1969 has no leap
-        // day between it and 1970).
+
         let january = try Time.Month(1)
         let year1971: Time.Year = 1971
         let year1969: Time.Year = 1969
@@ -133,18 +118,11 @@ extension Time.Epoch.Conversion.Tests.`Edge Case` {
         #expect(backward == -365)
     }
 
-    // MARK: - Century-skip boundary (the specific bug found while verifying the fix:
-    // a January-anchored 4-year-block decomposition silently mis-decodes the block
-    // immediately following a non-x400 century boundary, e.g. 1900-1904 or the
-    // symmetric case before 1970; this is not explicitly named in F-001's evidence
-    // locations but is the same root defect the fix must not merely paper over for
-    // pre-1970 dates only)
-
     @Test(
         arguments: [
-            // -497-12-31 (last day of a non-leap century-skip year, computed via Foundation-independent reference)
+
             -900_690,
-            -900_689,  // -496-01-01 (first day of the following year)
+            -900_689,
         ]
     )
     func `componentsRaw does not overflow into a 13th month across a century-skip boundary`(
@@ -163,10 +141,7 @@ extension Time.Epoch.Conversion.Tests.`Edge Case` {
 
     @Test
     func `year -497 to -496 boundary decodes correctly`() throws {
-        // -497 is not a leap year (divisible by 100 [-500 nearest], not 4-pattern-aligned
-        // the way a naive per-cycle block assumption expects); this pins down the exact
-        // boundary discovered while brute-force verifying the fix against a reference
-        // proleptic-Gregorian day-count algorithm.
+
         let yearMinus497: Time.Year = -497
         let december = try Time.Month(12)
         let yearMinus496: Time.Year = -496

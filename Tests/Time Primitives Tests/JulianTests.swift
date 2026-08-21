@@ -1,8 +1,3 @@
-// JulianTests.swift
-// StandardTime Tests
-//
-// Tests for Julian Day conversions
-
 import Dimension_Primitives
 import Testing
 import Time_Primitives
@@ -13,8 +8,6 @@ extension Time.Julian {
 
     @Suite
     struct Test {
-
-        // MARK: - Constants
 
         @Test
         func `unix Epoch Constant`() {
@@ -34,11 +27,9 @@ extension Time.Julian {
             #expect(offset.underlying == 2_400_000.5)
         }
 
-        // MARK: - Time → Julian Day
-
         @Test
         func `time To Julian Day J2000`() throws {
-            // J2000.0 is 2000-01-01 12:00:00 TT
+
             let time = try Time(year: 2000, month: 1, day: 1, hour: 12, minute: 0, second: 0)
             let jd = Time.Julian.Day(time)
             #expect(abs(jd.underlying - 2_451_545.0) < 0.0001)
@@ -46,7 +37,7 @@ extension Time.Julian {
 
         @Test
         func `time To Julian Day Unix Epoch`() throws {
-            // Unix epoch is 1970-01-01 00:00:00
+
             let time = try Time(year: 1970, month: 1, day: 1, hour: 0, minute: 0, second: 0)
             let jd = Time.Julian.Day(time)
             #expect(abs(jd.underlying - 2_440_587.5) < 0.0001)
@@ -54,7 +45,7 @@ extension Time.Julian {
 
         @Test
         func `time To Julian Day Midnight`() throws {
-            // Midnight should be .5 fraction
+
             let time = try Time(year: 2024, month: 6, day: 15, hour: 0, minute: 0, second: 0)
             let jd = Time.Julian.Day(time)
             let fractionalPart = jd.underlying - Double(Int(jd.underlying))
@@ -63,14 +54,12 @@ extension Time.Julian {
 
         @Test
         func `time To Julian Day Noon`() throws {
-            // Noon should be .0 fraction
+
             let time = try Time(year: 2024, month: 6, day: 15, hour: 12, minute: 0, second: 0)
             let jd = Time.Julian.Day(time)
             let fractionalPart = jd.underlying - Double(Int(jd.underlying))
             #expect(fractionalPart < 0.0001 || fractionalPart > 0.9999)
         }
-
-        // MARK: - Julian Day → Time
 
         @Test
         func `julian Day To Time J2000`() throws {
@@ -92,8 +81,6 @@ extension Time.Julian {
             #expect(time.hour.value == 0)
         }
 
-        // MARK: - Round Trip
-
         @Test
         func `round Trip Time To Julian Day`() throws {
             let original = try Time(
@@ -114,8 +101,6 @@ extension Time.Julian {
             #expect(restored.minute.value == original.minute.value)
             #expect(restored.second.value == original.second.value)
         }
-
-        // MARK: - Affine Arithmetic
 
         @Test
         func `day Minus Day Equals Offset`() {
@@ -141,8 +126,6 @@ extension Time.Julian {
             #expect(abs(result.underlying - 2_451_535.0) < 0.0001)
         }
 
-        // MARK: - Modified Julian Day
-
         @Test
         func `modified Julian Day J2000`() {
             let jd = Time.Julian.Day.j2000
@@ -156,8 +139,6 @@ extension Time.Julian {
             let mjd = jd - .modified
             #expect(abs(mjd.underlying - 51544.5) < 0.0001)
         }
-
-        // MARK: - Instant Conversions
 
         @available(macOS 13.0, iOS 16.0, tvOS 16.0, watchOS 9.0, *)
         @Test
@@ -186,8 +167,7 @@ extension Time.Julian {
             let restored = Instant(jd)
 
             #expect(restored.secondsSinceUnixEpoch == original.secondsSinceUnixEpoch)
-            // Note: precision loss expected due to Double's ~15 significant digits
-            // For large JD values, nanosecond precision is limited
+
             #expect(abs(restored.nanosecondFraction - original.nanosecondFraction) < 100_000)
         }
     }

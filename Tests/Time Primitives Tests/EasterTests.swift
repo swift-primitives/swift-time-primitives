@@ -1,8 +1,3 @@
-// EasterTests.swift
-// Time Tests
-//
-// Tests for Easter/Computus algorithm
-
 import Testing
 
 @testable import Time_Primitive
